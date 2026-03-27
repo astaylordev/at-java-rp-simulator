@@ -22,11 +22,13 @@ All configuration is provided via environment variables:
 
 ### Local development
 
-Copy `.env.example` to `.env` and fill in your values (`.env` is gitignored and should never be committed):
+Either set the environment variables directly, or copy `.env.example` to `.env` and fill in your values (`.env` is gitignored and should never be committed):
 
 ```bash
 cp .env.example .env
 ```
+
+Environment variables take precedence over `.env` if both are present.
 
 ## Running
 
