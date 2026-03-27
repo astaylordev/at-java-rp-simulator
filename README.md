@@ -54,12 +54,10 @@ App will be available at http://localhost:8080.
 
 ### With Maven
 
-```bash
-export OIDC_CLIENT_ID=your-client-id
-export OIDC_CLIENT_SECRET=your-secret
-export OIDC_ISSUER_URI=https://your-idp.example.com
+Ensure `src/main/resources/application-local.yml` is configured (see [Local development](#local-development)), then:
 
-mvn spring-boot:run
+```bash
+SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 ```
 
 ### With VS Code Dev Container
