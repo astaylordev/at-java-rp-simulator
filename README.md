@@ -1,4 +1,4 @@
-# RP Simulator
+# Java RP Simulator
 
 A Spring Boot application that simulates an OIDC Relying Party (RP). Useful for testing OpenID Connect identity providers — it performs a standard authorization code flow with PKCE and displays the resulting ID token claims.
 
