@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OIDC RP Simulator</title>
-    <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 80px auto; padding: 0 20px; }
-        .btn { display: inline-block; padding: 10px 24px; background: #0055a4; color: white;
-               text-decoration: none; border-radius: 4px; font-size: 16px; }
-        .btn:hover { background: #003d7a; }
-    </style>
+    <link rel="stylesheet" href="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.css">
+    <script type="module" src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.esm.js"></script>
+    <script nomodule src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.js"></script>
 </head>
 <body>
-    <h1>OIDC RP Simulator</h1>
-    <p>This application simulates an OpenID Connect Relying Party using Authorization Code flow with PKCE.</p>
+    <gcds-header lang="en" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
 
-    <div sec:authorize="isAuthenticated()">
-        <p>You are logged in. <a th:href="@{/profile}">View your profile</a>.</p>
-    </div>
+    <gcds-container id="main-content" size="md" centered tag="main" padding="400">
+        <gcds-heading tag="h1">OIDC RP Simulator</gcds-heading>
+        <gcds-text>
+            This application simulates an OpenID Connect Relying Party using Authorization Code flow with PKCE.
+        </gcds-text>
 
-    <div sec:authorize="isAnonymous()">
-        <a class="btn" th:href="@{/oauth2/authorization/oidc-client}">Login with OIDC</a>
-    </div>
+        <div sec:authorize="isAuthenticated()">
+            <gcds-text>You are logged in. <gcds-link th:href="@{/profile}">View your profile</gcds-link>.</gcds-text>
+        </div>
+
+        <div sec:authorize="isAnonymous()">
+            <gcds-button type="link" th:href="@{/oauth2/authorization/oidc-client}">Login with OIDC</gcds-button>
+        </div>
+    </gcds-container>
+
+    <gcds-footer lang="en" display="compact"></gcds-footer>
 </body>
 </html>

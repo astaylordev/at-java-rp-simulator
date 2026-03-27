@@ -1,41 +1,49 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile — OIDC RP Simulator</title>
+    <link rel="stylesheet" href="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.css">
+    <script type="module" src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.esm.js"></script>
+    <script nomodule src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.js"></script>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #ddd; }
-        th { background: #f4f4f4; font-weight: 600; }
-        td:first-child { font-family: monospace; color: #555; width: 30%; }
+        table { width: 100%; border-collapse: collapse; margin-top: var(--gcds-spacing-400); }
+        th, td { text-align: left; padding: var(--gcds-spacing-200) var(--gcds-spacing-300); border-bottom: 1px solid var(--gcds-color-greyscale-200); }
+        th { background: var(--gcds-color-greyscale-50); font-weight: 600; }
+        td:first-child { font-family: monospace; color: var(--gcds-color-greyscale-700); width: 30%; }
         td:last-child { word-break: break-all; }
-        .logout { float: right; padding: 8px 16px; background: #c0392b; color: white;
-                  border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .logout:hover { background: #a93226; }
     </style>
 </head>
 <body>
-    <h1>
-        Welcome, <span th:text="${name ?: 'User'}">User</span>
-        <form th:action="@{/logout}" method="post" style="display:inline">
-            <button class="logout" type="submit">Logout</button>
-        </form>
-    </h1>
+    <gcds-header lang="en" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
 
-    <h2>OIDC Claims</h2>
-    <table>
-        <thead>
-            <tr><th>Claim</th><th>Value</th></tr>
-        </thead>
-        <tbody>
-            <tr th:each="entry : ${claims}">
-                <td th:text="${entry.key}">claim</td>
-                <td th:text="${entry.value}">value</td>
-            </tr>
-        </tbody>
-    </table>
+    <gcds-container id="main-content" size="lg" centered tag="main" padding="400">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--gcds-spacing-300)">
+            <gcds-heading tag="h1">
+                Welcome, <span th:text="${name ?: 'User'}">User</span>
+            </gcds-heading>
+            <form th:action="@{/logout}" method="post">
+                <gcds-button type="submit" button-role="danger">Logout</gcds-button>
+            </form>
+        </div>
 
-    <p style="margin-top:20px"><a th:href="@{/}">Back to home</a></p>
+        <gcds-heading tag="h2">OIDC Claims</gcds-heading>
+        <table>
+            <thead>
+                <tr><th>Claim</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${claims}">
+                    <td th:text="${entry.key}">claim</td>
+                    <td th:text="${entry.value}">value</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <gcds-text margin-top="400"><gcds-link th:href="@{/}">Back to home</gcds-link></gcds-text>
+    </gcds-container>
+
+    <gcds-footer lang="en" display="compact"></gcds-footer>
 </body>
 </html>
