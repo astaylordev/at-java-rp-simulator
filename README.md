@@ -13,12 +13,32 @@ A Spring Boot application that simulates an OIDC Relying Party (RP). Useful for 
 
 All configuration is provided via environment variables:
 
-| Variable            | Description                        | Default                      |
-|---------------------|------------------------------------|------------------------------|
-| `OIDC_CLIENT_ID`    | Client ID registered with the IdP  | `rp-simulator`               |
-| `OIDC_CLIENT_SECRET`| Client secret                      | `changeme`                   |
-| `OIDC_ISSUER_URI`   | IdP issuer URI                     | `https://example.com`        |
-| `OIDC_SCOPES`       | Comma-separated list of scopes     | `openid,profile,email`       |
+| Variable            | Description                        | Default                |
+|---------------------|------------------------------------|------------------------|
+| `OIDC_CLIENT_ID`    | Client ID registered with the IdP  | _(required)_           |
+| `OIDC_CLIENT_SECRET`| Client secret                      | _(required)_           |
+| `OIDC_ISSUER_URI`   | IdP issuer URI                     | _(required)_           |
+| `OIDC_SCOPES`       | Comma-separated list of scopes     | `openid,profile,email` |
+
+### Local development
+
+For local development, create `src/main/resources/application-local.yml` (this file is gitignored and should never be committed):
+
+```yaml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          oidc-client:
+            client-id: your-client-id
+            client-secret: your-client-secret
+        provider:
+          oidc-client:
+            issuer-uri: https://your-idp.example.com/oauth2
+```
+
+The devcontainer sets `SPRING_PROFILES_ACTIVE=local` automatically, so this file will be picked up when running inside VS Code.
 
 ## Running
 
