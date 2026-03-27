@@ -6,18 +6,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Locale;
+
 @Controller
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
+    public String home(Locale locale, Model model) {
+        model.addAttribute("lang", locale.getLanguage());
         return "index";
     }
 
     @GetMapping("/profile")
-    public String profile(@AuthenticationPrincipal OidcUser oidcUser, Model model) {
+    public String profile(@AuthenticationPrincipal OidcUser oidcUser, Locale locale, Model model) {
         model.addAttribute("claims", oidcUser.getClaims());
         model.addAttribute("name", oidcUser.getFullName());
+        model.addAttribute("lang", locale.getLanguage());
         return "profile";
     }
 }

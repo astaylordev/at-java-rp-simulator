@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OIDC RP Simulator</title>
+    <title th:text="#{home.title}">OIDC RP Simulator</title>
     <link rel="stylesheet" href="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.css">
     <script type="module" src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.esm.js"></script>
     <script nomodule src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.js"></script>
 </head>
 <body>
-    <gcds-header lang="en" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
+    <gcds-header th:attr="lang=${lang},lang-href='?lang=' + #{lang.toggle-href}" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
 
     <gcds-container id="main-content" size="md" centered tag="main" padding="400">
-        <gcds-heading tag="h1">OIDC RP Simulator</gcds-heading>
-        <gcds-text>
-            This application simulates an OpenID Connect Relying Party using Authorization Code flow with PKCE.
-        </gcds-text>
+        <gcds-heading tag="h1" th:text="#{home.heading}">OIDC RP Simulator</gcds-heading>
+        <gcds-text th:text="#{home.description}">Description</gcds-text>
 
         <div sec:authorize="isAuthenticated()">
-            <gcds-text>You are logged in. <gcds-link th:href="@{/profile}">View your profile</gcds-link>.</gcds-text>
+            <gcds-text>
+                <gcds-link th:href="@{/profile}" th:text="#{home.login}">View your profile</gcds-link>
+            </gcds-text>
         </div>
 
         <div sec:authorize="isAnonymous()">
-            <gcds-button type="link" th:href="@{/oauth2/authorization/oidc-client}">Login with OIDC</gcds-button>
+            <gcds-button type="link" th:href="@{/oauth2/authorization/oidc-client}" th:text="#{home.login}">Login with OIDC</gcds-button>
         </div>
     </gcds-container>
 
-    <gcds-footer lang="en" display="compact"></gcds-footer>
+    <gcds-footer th:attr="lang=${lang}" display="compact"></gcds-footer>
 </body>
 </html>

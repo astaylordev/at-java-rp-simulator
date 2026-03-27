@@ -1,49 +1,102 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile — OIDC RP Simulator</title>
+    <title th:text="#{profile.title}">Profile — OIDC RP Simulator</title>
     <link rel="stylesheet" href="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.css">
     <script type="module" src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.esm.js"></script>
     <script nomodule src="https://unpkg.com/@cdssnc/gcds-components/dist/gcds/gcds.js"></script>
     <style>
-        table { width: 100%; border-collapse: collapse; margin-top: var(--gcds-spacing-400); }
-        th, td { text-align: left; padding: var(--gcds-spacing-200) var(--gcds-spacing-300); border-bottom: 1px solid var(--gcds-color-greyscale-200); }
-        th { background: var(--gcds-color-greyscale-50); font-weight: 600; }
-        td:first-child { font-family: monospace; color: var(--gcds-color-greyscale-700); width: 30%; }
-        td:last-child { word-break: break-all; }
+        /* Canada.ca data table pattern */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--gcds-spacing-400);
+            font-size: var(--gcds-font-sizes-text-medium);
+            border: 1px solid #bbbfc5;
+        }
+        .table caption {
+            text-align: left;
+            font-weight: 700;
+            font-size: var(--gcds-font-sizes-text-medium);
+            padding: var(--gcds-spacing-200) 0;
+            caption-side: top;
+            color: inherit;
+        }
+        .table thead tr {
+            background: #335075;
+            color: white;
+        }
+        .table th {
+            text-align: left;
+            padding: var(--gcds-spacing-200) var(--gcds-spacing-300);
+            font-weight: 600;
+            border-right: 1px solid #4d6e94;
+            vertical-align: bottom;
+        }
+        .table th:last-child { border-right: none; }
+        .table tbody tr:nth-child(odd) { background: #f5f5f5; }
+        .table tbody tr:nth-child(even) { background: #ffffff; }
+        .table tbody tr:hover { background: #e8f0f8; }
+        .table td {
+            padding: var(--gcds-spacing-200) var(--gcds-spacing-300);
+            border-top: 1px solid #bbbfc5;
+            border-right: 1px solid #bbbfc5;
+            vertical-align: top;
+        }
+        .table td:last-child { border-right: none; }
+        .table td.claim-key {
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: nowrap;
+            width: 30%;
+        }
+        .table td.claim-value { word-break: break-all; }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--gcds-spacing-300);
+            margin-bottom: var(--gcds-spacing-400);
+        }
     </style>
 </head>
 <body>
-    <gcds-header lang="en" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
+    <gcds-header th:attr="lang=${lang},lang-href='?lang=' + #{lang.toggle-href}" skip-to-href="#main-content" signature-variant="colour"></gcds-header>
 
     <gcds-container id="main-content" size="lg" centered tag="main" padding="400">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--gcds-spacing-300)">
-            <gcds-heading tag="h1">
-                Welcome, <span th:text="${name ?: 'User'}">User</span>
-            </gcds-heading>
+        <div class="profile-header">
+            <gcds-heading tag="h1" th:text="#{profile.welcome(${name ?: 'User'})}">Welcome</gcds-heading>
             <form th:action="@{/logout}" method="post">
-                <gcds-button type="submit" button-role="danger">Logout</gcds-button>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <gcds-button button-role="danger" type="submit" th:text="#{profile.logout}">Logout</gcds-button>
             </form>
         </div>
 
-        <gcds-heading tag="h2">OIDC Claims</gcds-heading>
-        <table>
+        <table class="table">
+            <caption th:text="#{profile.claims}">OIDC Claims</caption>
             <thead>
-                <tr><th>Claim</th><th>Value</th></tr>
+                <tr>
+                    <th scope="col" th:text="#{profile.claim}">Claim</th>
+                    <th scope="col" th:text="#{profile.value}">Value</th>
+                </tr>
             </thead>
             <tbody>
                 <tr th:each="entry : ${claims}">
-                    <td th:text="${entry.key}">claim</td>
-                    <td th:text="${entry.value}">value</td>
+                    <td class="claim-key" th:text="${entry.key}">claim</td>
+                    <td class="claim-value" th:text="${entry.value}">value</td>
                 </tr>
             </tbody>
         </table>
 
-        <gcds-text margin-top="400"><gcds-link th:href="@{/}">Back to home</gcds-link></gcds-text>
+        <gcds-text margin-top="400">
+            <gcds-link th:href="@{/}" th:text="#{profile.back}">Back to home</gcds-link>
+        </gcds-text>
     </gcds-container>
 
-    <gcds-footer lang="en" display="compact"></gcds-footer>
+    <gcds-footer th:attr="lang=${lang}" display="compact"></gcds-footer>
 </body>
 </html>
