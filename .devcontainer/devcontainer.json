@@ -28,7 +28,5 @@
       ]
     }
   },
-  "remoteEnv": {
-    "SPRING_PROFILES_ACTIVE": "local"
-  }
+  "runArgs": ["--env-file", ".env"]
 }

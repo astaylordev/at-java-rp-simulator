@@ -23,8 +23,6 @@ target/
 
 # Environment
 .env
-application-local.yml
-src/main/resources/application-local.yml
 
 # Merge artifacts
 *.orig
