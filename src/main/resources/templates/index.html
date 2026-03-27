@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>OIDC RP Simulator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 80px auto; padding: 0 20px; }
+        .btn { display: inline-block; padding: 10px 24px; background: #0055a4; color: white;
+               text-decoration: none; border-radius: 4px; font-size: 16px; }
+        .btn:hover { background: #003d7a; }
+    </style>
+</head>
+<body>
+    <h1>OIDC RP Simulator</h1>
+    <p>This application simulates an OpenID Connect Relying Party using Authorization Code flow with PKCE.</p>
+
+    <div sec:authorize="isAuthenticated()">
+        <p>You are logged in. <a th:href="@{/profile}">View your profile</a>.</p>
+    </div>
+
+    <div sec:authorize="isAnonymous()">
+        <a class="btn" th:href="@{/oauth2/authorization/oidc-client}">Login with OIDC</a>
+    </div>
+</body>
+</html>

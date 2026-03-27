@@ -1,0 +1,28 @@
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Maven wrapper binaries
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled output
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+**/.DS_Store
+
+# Environment
+.env
+
+# Merge artifacts
+*.orig

@@ -1,0 +1,10 @@
+services:
+  rp-simulator:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      OIDC_CLIENT_ID: rp-simulator
+      OIDC_CLIENT_SECRET: changeme
+      OIDC_ISSUER_URI: https://your-idp.example.com
+      OIDC_SCOPES: openid,profile,email
