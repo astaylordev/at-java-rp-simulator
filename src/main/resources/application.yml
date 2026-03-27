@@ -4,14 +4,14 @@ spring:
       client:
         registration:
           oidc-client:
-            client-id: ${OIDC_CLIENT_ID:rp-simulator}
-            client-secret: ${OIDC_CLIENT_SECRET:changeme}
+            client-id: ${OIDC_CLIENT_ID}
+            client-secret: ${OIDC_CLIENT_SECRET}
             scope: ${OIDC_SCOPES:openid,profile,email}
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "{baseUrl}/callback"
         provider:
           oidc-client:
-            issuer-uri: ${OIDC_ISSUER_URI:https://example.com}
+            issuer-uri: ${OIDC_ISSUER_URI}
 
 management:
   endpoints:

@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
             .oauth2Login(o -> o
                 .authorizationEndpoint(e -> e.authorizationRequestResolver(resolver))
+                .redirectionEndpoint(e -> e.baseUri("/callback"))
                 .defaultSuccessUrl("/profile", true))
             .oidcLogout(l -> l.backChannel(Customizer.withDefaults()))
             .logout(l -> l.logoutSuccessUrl("/"));
