@@ -1,7 +1,7 @@
 locals {
   # Override via: CONTAINER_IMAGE_TAG=abc123 terragrunt apply
   ecr_image_tag = get_env("CONTAINER_IMAGE_TAG", "latest")
-  ssm_prefix    = "/rp-simulator/scratch"
+  ssm_prefix    = "/java-rp-simulator/scratch"
 }
 
 terraform {

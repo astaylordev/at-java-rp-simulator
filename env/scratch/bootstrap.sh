@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REGION="ca-central-1"
-SERVICE="rp-simulator"
+SERVICE="java-rp-simulator"
 ENV="scratch"
 BUCKET="${SERVICE}-${ENV}-tf"
 TABLE="${SERVICE}-${ENV}-tf-lock"
