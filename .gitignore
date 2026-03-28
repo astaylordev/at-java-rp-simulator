@@ -27,6 +27,9 @@ target/
 # Merge artifacts
 *.orig
 
+# Local AWS credentials
+creds.sh
+
 # Terraform
 .terraform/
 .terraform.lock.hcl
