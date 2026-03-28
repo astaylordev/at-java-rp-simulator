@@ -51,13 +51,13 @@ variable "oidc_scopes" {
   default     = "openid,profile,email"
 }
 
-variable "oidc_client_id_ssm_path" {
-  description = "SSM parameter path for the OIDC client ID (e.g. /rp-simulator/scratch/oidc-client-id)"
+variable "oidc_client_id_secret_name" {
+  description = "Secrets Manager secret name for the OIDC client ID (e.g. java-rp-simulator/scratch/oidc-client-id)"
   type        = string
 }
 
-variable "oidc_client_secret_ssm_path" {
-  description = "SSM parameter path for the OIDC client secret (e.g. /rp-simulator/scratch/oidc-client-secret)"
+variable "oidc_client_secret_secret_name" {
+  description = "Secrets Manager secret name for the OIDC client secret (e.g. java-rp-simulator/scratch/oidc-client-secret)"
   type        = string
 }
 

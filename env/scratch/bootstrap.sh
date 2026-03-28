@@ -9,7 +9,7 @@ SERVICE="java-rp-simulator"
 ENV="scratch"
 BUCKET="${SERVICE}-${ENV}-tf"
 TABLE="${SERVICE}-${ENV}-tf-lock"
-SSM_PREFIX="/${SERVICE}/${ENV}"
+SECRET_PREFIX="${SERVICE}/${ENV}"
 
 echo "==> Creating S3 bucket for Terraform state: ${BUCKET}"
 if aws s3api head-bucket --bucket "${BUCKET}" --region "${REGION}" 2>/dev/null; then
@@ -52,8 +52,8 @@ else
 fi
 
 echo ""
-echo "==> Creating SSM parameters for OIDC credentials"
-echo "    (Values are stored as SecureString — never committed to source control)"
+echo "==> Creating Secrets Manager secrets for OIDC credentials"
+echo "    (Values are stored encrypted — never committed to source control)"
 echo ""
 
 printf "OIDC Client ID: "
@@ -63,19 +63,29 @@ printf "OIDC Client Secret: "
 read -rs OIDC_CLIENT_SECRET
 echo ""
 
-aws ssm put-parameter \
-  --name "${SSM_PREFIX}/oidc-client-id" \
-  --value "${OIDC_CLIENT_ID}" \
-  --type "SecureString" \
-  --overwrite \
-  --region "${REGION}"
+for SECRET_NAME in "${SECRET_PREFIX}/oidc-client-id" "${SECRET_PREFIX}/oidc-client-secret"; do
+  if aws secretsmanager describe-secret --secret-id "${SECRET_NAME}" --region "${REGION}" > /dev/null 2>&1; then
+    echo "    Secret ${SECRET_NAME} already exists, skipping creation."
+  else
+    aws secretsmanager create-secret \
+      --name "${SECRET_NAME}" \
+      --region "${REGION}" \
+      --secret-string "placeholder" > /dev/null
+    echo "    Created ${SECRET_NAME}."
+  fi
+done
 
-aws ssm put-parameter \
-  --name "${SSM_PREFIX}/oidc-client-secret" \
-  --value "${OIDC_CLIENT_SECRET}" \
-  --type "SecureString" \
-  --overwrite \
-  --region "${REGION}"
+aws secretsmanager put-secret-value \
+  --secret-id "${SECRET_PREFIX}/oidc-client-id" \
+  --secret-string "${OIDC_CLIENT_ID}" \
+  --region "${REGION}" > /dev/null
+
+aws secretsmanager put-secret-value \
+  --secret-id "${SECRET_PREFIX}/oidc-client-secret" \
+  --secret-string "${OIDC_CLIENT_SECRET}" \
+  --region "${REGION}" > /dev/null
+
+echo "    Secrets updated."
 
 echo ""
 echo "==> Bootstrap complete."
@@ -96,4 +106,4 @@ echo "     (cd env/scratch/networking && terragrunt apply)"
 echo "     (cd env/scratch/ecs && terragrunt apply)"
 echo ""
 echo "  3. Register your redirect URI with your OIDC provider:"
-echo "     http://\$(cd env/scratch/networking && terragrunt output -raw alb_dns_name)/callback"
+echo "     https://\$(cd env/scratch/networking && terragrunt output -raw cloudfront_domain)/callback"

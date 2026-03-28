@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
@@ -121,6 +123,72 @@ resource "aws_lb_listener" "http" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
+# Security group for interface VPC endpoints — allow HTTPS from the ECS tasks SG
+resource "aws_security_group" "vpc_endpoints" {
+  name        = "${var.service_name}-vpc-endpoints"
+  description = "Allow HTTPS from ECS tasks to VPC endpoints"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description     = "HTTPS from ECS tasks"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs.id]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
+  }
+
+  tags = {
+    (var.billing_tag_key) = var.billing_tag_value
+  }
+}
+
+locals {
+  # Interface endpoints needed by ECS tasks in private subnets
+  interface_endpoints = toset([
+    "secretsmanager",
+    "ecr.api",
+    "ecr.dkr",
+    "logs",
+  ])
+}
+
+resource "aws_vpc_endpoint" "interface" {
+  for_each = local.interface_endpoints
+
+  vpc_id              = module.vpc.vpc_id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.${each.key}"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.vpc.private_subnet_ids
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  private_dns_enabled = true
+
+  tags = {
+    Name                  = "${var.service_name}-${each.key}"
+    (var.billing_tag_key) = var.billing_tag_value
+  }
+}
+
+# S3 gateway endpoint — required for ECS to pull ECR image layers
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = module.vpc.private_route_table_ids
+
+  tags = {
+    Name                  = "${var.service_name}-s3"
+    (var.billing_tag_key) = var.billing_tag_value
   }
 }
 

@@ -1,7 +1,7 @@
 locals {
   # Override via: CONTAINER_IMAGE_TAG=abc123 terragrunt apply
-  ecr_image_tag = get_env("CONTAINER_IMAGE_TAG", "latest")
-  ssm_prefix    = "/java-rp-simulator/scratch"
+  ecr_image_tag  = get_env("CONTAINER_IMAGE_TAG", "latest")
+  secret_prefix  = "java-rp-simulator/scratch"
 }
 
 terraform {
@@ -49,8 +49,8 @@ inputs = {
   oidc_scopes     = "openid,profile,email"
   app_base_url    = "https://${dependency.networking.outputs.cloudfront_domain}"
 
-  # OIDC client ID and secret are stored in SSM and fetched by ECS at runtime.
+  # OIDC client ID and secret are stored in Secrets Manager and fetched by ECS at runtime.
   # Create them with bootstrap.sh or manually via the AWS console/CLI.
-  oidc_client_id_ssm_path     = "${local.ssm_prefix}/oidc-client-id"
-  oidc_client_secret_ssm_path = "${local.ssm_prefix}/oidc-client-secret"
+  oidc_client_id_secret_name     = "${local.secret_prefix}/oidc-client-id"
+  oidc_client_secret_secret_name = "${local.secret_prefix}/oidc-client-secret"
 }

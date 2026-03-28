@@ -1,23 +1,25 @@
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
-locals {
-  oidc_client_id_ssm_arn     = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${var.oidc_client_id_ssm_path}"
-  oidc_client_secret_ssm_arn = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${var.oidc_client_secret_ssm_path}"
+data "aws_secretsmanager_secret" "oidc_client_id" {
+  name = var.oidc_client_id_secret_name
 }
 
-# IAM policy allowing the ECS task execution role to fetch secrets from SSM
-data "aws_iam_policy_document" "task_exec_ssm" {
+data "aws_secretsmanager_secret" "oidc_client_secret" {
+  name = var.oidc_client_secret_secret_name
+}
+
+# IAM policy allowing the ECS task execution role to fetch secrets from Secrets Manager
+data "aws_iam_policy_document" "task_exec_secrets" {
   statement {
-    sid    = "AllowSSMParameterAccess"
+    sid    = "AllowSecretsManagerAccess"
     effect = "Allow"
     actions = [
-      "ssm:GetParameters",
-      "ssm:GetParameter",
+      "secretsmanager:GetSecretValue",
     ]
     resources = [
-      local.oidc_client_id_ssm_arn,
-      local.oidc_client_secret_ssm_arn,
+      data.aws_secretsmanager_secret.oidc_client_id.arn,
+      data.aws_secretsmanager_secret.oidc_client_secret.arn,
     ]
   }
 }
@@ -43,10 +45,10 @@ module "ecs" {
     { name = "APP_BASE_URL", value = var.app_base_url },
   ]
 
-  # Secrets fetched from SSM Parameter Store at task startup
+  # Secrets fetched from Secrets Manager at task startup
   container_secrets = [
-    { name = "OIDC_CLIENT_ID", valueFrom = var.oidc_client_id_ssm_path },
-    { name = "OIDC_CLIENT_SECRET", valueFrom = var.oidc_client_secret_ssm_path },
+    { name = "OIDC_CLIENT_ID", valueFrom = data.aws_secretsmanager_secret.oidc_client_id.arn },
+    { name = "OIDC_CLIENT_SECRET", valueFrom = data.aws_secretsmanager_secret.oidc_client_secret.arn },
   ]
 
   container_health_check = {
@@ -64,8 +66,8 @@ module "ecs" {
   subnet_ids          = var.private_subnet_ids
   security_group_ids  = [var.ecs_security_group_id]
 
-  # Grant the task execution role access to the SSM parameters
-  task_exec_role_policy_documents = [data.aws_iam_policy_document.task_exec_ssm.json]
+  # Grant the task execution role access to the Secrets Manager secrets
+  task_exec_role_policy_documents = [data.aws_iam_policy_document.task_exec_secrets.json]
 
   billing_tag_value = var.billing_tag_value
 }
