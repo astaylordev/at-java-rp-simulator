@@ -31,6 +31,7 @@ dependency "networking" {
     private_subnet_ids    = ["subnet-00000000000000001", "subnet-00000000000000002"]
     ecs_security_group_id = "sg-00000000000000001"
     alb_target_group_arn  = "arn:aws:elasticloadbalancing:ca-central-1:000000000000:targetgroup/rp-simulator/0000000000000000"
+    cloudfront_domain     = "xxxxxxxxxxxx.cloudfront.net"
   }
 }
 
@@ -46,6 +47,7 @@ inputs = {
   # e.g. export OIDC_ISSUER_URI=https://login.microsoftonline.com/<tenant>/v2.0
   oidc_issuer_uri = get_env("OIDC_ISSUER_URI")
   oidc_scopes     = "openid,profile,email"
+  app_base_url    = "https://${dependency.networking.outputs.cloudfront_domain}"
 
   # OIDC client ID and secret are stored in SSM and fetched by ECS at runtime.
   # Create them with bootstrap.sh or manually via the AWS console/CLI.

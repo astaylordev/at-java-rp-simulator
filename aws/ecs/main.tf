@@ -40,6 +40,7 @@ module "ecs" {
   container_environment = [
     { name = "OIDC_ISSUER_URI", value = var.oidc_issuer_uri },
     { name = "OIDC_SCOPES", value = var.oidc_scopes },
+    { name = "APP_BASE_URL", value = var.app_base_url },
   ]
 
   # Secrets fetched from SSM Parameter Store at task startup

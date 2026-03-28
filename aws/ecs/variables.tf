@@ -40,6 +40,11 @@ variable "oidc_issuer_uri" {
   type        = string
 }
 
+variable "app_base_url" {
+  description = "Public base URL of the app used for the OIDC redirect URI (e.g. https://xxxx.cloudfront.net)"
+  type        = string
+}
+
 variable "oidc_scopes" {
   description = "Space or comma-separated OIDC scopes"
   type        = string

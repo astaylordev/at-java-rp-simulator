@@ -29,6 +29,11 @@ output "alb_target_group_arn" {
 }
 
 output "alb_dns_name" {
-  description = "ALB public DNS name — use this as the base URL for your OIDC redirect URI"
+  description = "ALB public DNS name"
   value       = aws_lb.app.dns_name
+}
+
+output "cloudfront_domain" {
+  description = "CloudFront distribution domain name — use this as the base URL for your OIDC redirect URI"
+  value       = aws_cloudfront_distribution.app.domain_name
 }

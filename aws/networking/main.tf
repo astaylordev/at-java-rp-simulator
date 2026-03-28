@@ -1,3 +1,15 @@
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "all_viewer_except_host" {
+  name = "Managed-AllViewerExceptHostHeader"
+}
+
 # VPC with public and private subnets across 2 AZs
 module "vpc" {
   source = "github.com/cds-snc/terraform-modules//vpc?ref=main"
@@ -17,11 +29,11 @@ resource "aws_security_group" "alb" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "HTTP from internet"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-ingress-sgr
+    description     = "HTTP from CloudFront"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   egress {
@@ -109,5 +121,48 @@ resource "aws_lb_listener" "http" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
+# CloudFront distribution — HTTPS termination in front of the ALB
+resource "aws_cloudfront_distribution" "app" {
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = var.service_name
+
+  origin {
+    domain_name = aws_lb.app.dns_name
+    origin_id   = "alb"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "alb"
+    viewer_protocol_policy = "redirect-to-https"
+
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  tags = {
+    (var.billing_tag_key) = var.billing_tag_value
   }
 }
