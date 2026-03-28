@@ -26,3 +26,17 @@ target/
 
 # Merge artifacts
 *.orig
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+
+# Terragrunt
+.terragrunt-cache/
